@@ -5,6 +5,7 @@ import healthRoutes from "./modules/task/route/health.routes.js"
 import taskRoutes from './modules/task/route/task.routes.js'
 import errorHandler from "./middleware/error.middleware.js";
 import openApiDocument from "./config/api-docs.js";
+import employeeRoutes from "./modules/employee/routes/employee.route.js"
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/api-docs", apiReference({spec: {content: openApiDocument}}))
 
 app.use("/api", healthRoutes)
 app.use("/api/tasks", taskRoutes)
+app.use("/api/employee", employeeRoutes)
 
 app.use(errorHandler)
 
