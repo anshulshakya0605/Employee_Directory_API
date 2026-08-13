@@ -1,0 +1,268 @@
+openapi: 3.0.3
+
+info:
+  title: Task Management API
+  description: REST API for the Task Management System
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000
+    description: Local Development Server
+
+tags:
+  - name: Tasks
+    description: Task management APIs
+
+paths:
+
+  /api/tasks:
+
+    post:
+      tags:
+        - Tasks
+      summary: Create a new task
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTaskRequest"
+
+      responses:
+        "201":
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+
+        "400":
+          description: Validation failed
+
+        "500":
+          description: Internal server error
+
+
+    get:
+      tags:
+        - Tasks
+      summary: Get all tasks
+
+      responses:
+        "200":
+          description: Tasks fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskListResponse"
+
+        "500":
+          description: Internal server error
+
+
+  /api/tasks/{id}:
+
+    get:
+      tags:
+        - Tasks
+      summary: Get task by ID
+
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+
+      responses:
+        "200":
+          description: Task fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+
+        "400":
+          description: Invalid task ID
+
+        "404":
+          description: Task not found
+
+        "500":
+          description: Internal server error
+
+
+    put:
+      tags:
+        - Tasks
+      summary: Update a task
+
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTaskRequest"
+
+      responses:
+        "200":
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskResponse"
+
+        "400":
+          description: Invalid task ID
+
+        "404":
+          description: Task not found
+
+        "500":
+          description: Internal server error
+
+
+    delete:
+      tags:
+        - Tasks
+      summary: Delete a task
+
+      parameters:
+        - $ref: "#/components/parameters/TaskId"
+
+      responses:
+        "200":
+          description: Task deleted successfully
+
+        "400":
+          description: Invalid task ID
+
+        "404":
+          description: Task not found
+
+        "500":
+          description: Internal server error
+
+
+components:
+
+  parameters:
+
+    TaskId:
+      name: id
+      in: path
+      required: true
+      description: MongoDB ObjectId of the task
+      schema:
+        type: string
+        example: 507f1f77bcf86cd799439011
+
+
+  schemas:
+
+    Task:
+      type: object
+      properties:
+
+        _id:
+          type: string
+          example: 6899f2a7c8e4d123456789ab
+
+        title:
+          type: string
+          example: Learn Node.js
+
+        description:
+          type: string
+          example: Learn Express and MongoDB
+
+        completed:
+          type: boolean
+          example: false
+
+        createdAt:
+          type: string
+          format: date-time
+
+        updatedAt:
+          type: string
+          format: date-time
+
+
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+
+      properties:
+
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: Learn Node.js
+
+        description:
+          type: string
+          example: Learn Express and MongoDB
+
+        completed:
+          type: boolean
+          default: false
+          example: false
+
+
+    UpdateTaskRequest:
+      type: object
+
+      properties:
+
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: Learn Express deeply
+
+        description:
+          type: string
+          example: Build production APIs
+
+        completed:
+          type: boolean
+          example: true
+
+
+    TaskResponse:
+      type: object
+
+      properties:
+
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Task fetched successfully
+
+        data:
+          $ref: "#/components/schemas/Task"
+
+
+    TaskListResponse:
+      type: object
+
+      properties:
+
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Tasks fetched successfully
+
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
