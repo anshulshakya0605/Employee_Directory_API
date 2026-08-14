@@ -1,8 +1,8 @@
 openapi: 3.0.3
 
 info:
-  title: Task Management API
-  description: REST API for the Task Management System
+  title: Task & Employee Management API
+  description: REST API for Task Management and Employee Management System
   version: 1.0.0
 
 servers:
@@ -13,7 +13,14 @@ tags:
   - name: Tasks
     description: Task management APIs
 
+  - name: Employees
+    description: Employee management APIs
+
 paths:
+
+  # ==========================================
+  # TASK APIs
+  # ==========================================
 
   /api/tasks:
 
@@ -144,6 +151,146 @@ paths:
           description: Internal server error
 
 
+  # ==========================================
+  # EMPLOYEE APIs
+  # ==========================================
+
+  /api/employees:
+
+    post:
+      tags:
+        - Employees
+      summary: Create a new employee
+      description: Create a new employee record
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEmployeeRequest"
+
+      responses:
+        "201":
+          description: Employee created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeeResponse"
+
+        "400":
+          description: Validation failed
+
+        "409":
+          description: Employee ID or email already exists
+
+        "500":
+          description: Internal server error
+
+
+    get:
+      tags:
+        - Employees
+      summary: Get all employees
+
+      responses:
+        "200":
+          description: Employees fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeeListResponse"
+
+        "500":
+          description: Internal server error
+
+
+  /api/employees/{id}:
+
+    get:
+      tags:
+        - Employees
+      summary: Get employee by MongoDB ID
+
+      parameters:
+        - $ref: "#/components/parameters/EmployeeId"
+
+      responses:
+        "200":
+          description: Employee fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeeResponse"
+
+        "400":
+          description: Invalid employee ID
+
+        "404":
+          description: Employee not found
+
+        "500":
+          description: Internal server error
+
+
+    put:
+      tags:
+        - Employees
+      summary: Update an employee
+
+      parameters:
+        - $ref: "#/components/parameters/EmployeeId"
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEmployeeRequest"
+
+      responses:
+        "200":
+          description: Employee updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeeResponse"
+
+        "400":
+          description: Invalid employee ID
+
+        "404":
+          description: Employee not found
+
+        "409":
+          description: Employee ID or email already exists
+
+        "500":
+          description: Internal server error
+
+
+    delete:
+      tags:
+        - Employees
+      summary: Delete an employee
+
+      parameters:
+        - $ref: "#/components/parameters/EmployeeId"
+
+      responses:
+        "200":
+          description: Employee deleted successfully
+
+        "400":
+          description: Invalid employee ID
+
+        "404":
+          description: Employee not found
+
+        "500":
+          description: Internal server error
+
+
 components:
 
   parameters:
@@ -153,15 +300,34 @@ components:
       in: path
       required: true
       description: MongoDB ObjectId of the task
+
       schema:
         type: string
-        example: 507f1f77bcf86cd799439011
+
+      example: 507f1f77bcf86cd799439011
+
+
+    EmployeeId:
+      name: id
+      in: path
+      required: true
+      description: MongoDB ObjectId of the employee
+
+      schema:
+        type: string
+
+      example: 6899f2a7c8e4d123456789ab
 
 
   schemas:
 
+    # ==========================================
+    # TASK SCHEMAS
+    # ==========================================
+
     Task:
       type: object
+
       properties:
 
         _id:
@@ -191,6 +357,7 @@ components:
 
     CreateTaskRequest:
       type: object
+
       required:
         - title
 
@@ -264,5 +431,207 @@ components:
 
         data:
           type: array
+
           items:
             $ref: "#/components/schemas/Task"
+
+
+    # ==========================================
+    # EMPLOYEE SCHEMAS
+    # ==========================================
+
+    Employee:
+      type: object
+
+      properties:
+
+        _id:
+          type: string
+          example: 6899f2a7c8e4d123456789ab
+
+        employeeId:
+          type: string
+          example: EMP001
+
+        firstName:
+          type: string
+          example: Anshul
+
+        lastName:
+          type: string
+          example: Kumar
+
+        email:
+          type: string
+          format: email
+          example: anshul@example.com
+
+        phone:
+          type: string
+          example: "9876543210"
+
+        designation:
+          type: string
+          example: Frontend Developer
+
+        department:
+          type: string
+          example: Engineering
+
+        salary:
+          type: number
+          example: 50000
+
+        joiningDate:
+          type: string
+          format: date-time
+          example: "2026-08-14T00:00:00.000Z"
+
+        profileImage:
+          type: string
+          nullable: true
+          example: null
+
+        createdAt:
+          type: string
+          format: date-time
+
+        updatedAt:
+          type: string
+          format: date-time
+
+
+    CreateEmployeeRequest:
+      type: object
+
+      required:
+        - employeeId
+        - firstName
+        - lastName
+        - email
+        - phone
+        - designation
+        - department
+        - salary
+        - joiningDate
+
+      properties:
+
+        employeeId:
+          type: string
+          example: EMP001
+
+        firstName:
+          type: string
+          example: Anshul
+
+        lastName:
+          type: string
+          example: Kumar
+
+        email:
+          type: string
+          format: email
+          example: anshul@example.com
+
+        phone:
+          type: string
+          example: "9876543210"
+
+        designation:
+          type: string
+          example: Frontend Developer
+
+        department:
+          type: string
+          example: Engineering
+
+        salary:
+          type: number
+          example: 50000
+
+        joiningDate:
+          type: string
+          format: date
+          example: "2026-08-14"
+
+
+    UpdateEmployeeRequest:
+      type: object
+
+      properties:
+
+        employeeId:
+          type: string
+          example: EMP001
+
+        firstName:
+          type: string
+          example: Anshul
+
+        lastName:
+          type: string
+          example: Kumar
+
+        email:
+          type: string
+          format: email
+          example: anshul@example.com
+
+        phone:
+          type: string
+          example: "9876543210"
+
+        designation:
+          type: string
+          example: Full Stack Developer
+
+        department:
+          type: string
+          example: Engineering
+
+        salary:
+          type: number
+          example: 70000
+
+        joiningDate:
+          type: string
+          format: date
+          example: "2026-08-14"
+
+
+    EmployeeResponse:
+      type: object
+
+      properties:
+
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Employee operation successful
+
+        data:
+          $ref: "#/components/schemas/Employee"
+
+
+    EmployeeListResponse:
+      type: object
+
+      properties:
+
+        success:
+          type: boolean
+          example: true
+
+        message:
+          type: string
+          example: Employees fetched successfully
+
+        data:
+          type: array
+
+          items:
+            $ref: "#/components/schemas/Employee"

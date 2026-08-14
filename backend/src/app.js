@@ -20,7 +20,7 @@ app.use("/api-docs", apiReference({spec: {content: openApiDocument}}))
 
 app.use("/api", healthRoutes)
 app.use("/api/tasks", taskRoutes)
-app.use("/api/employee", employeeRoutes)
+app.use("/api/employees", employeeRoutes)
 
 app.use(errorHandler)
 

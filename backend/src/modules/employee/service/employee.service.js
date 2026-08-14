@@ -56,13 +56,35 @@ export const fetchEmployeeByIdService = async (employeeId) => {
 export const updateEmployeeService = async (employeeId, employeeData) => {
     validateEmployeeId(employeeId)
 
-    const employee = await updateEmployee(employeeId, employeeData);
+    const employee = await fetchEmployeeById(employeeId);
+
     if (!employee) {
-        const error = new Error("Employee Not Found")
-        error.statusCode = 404
-        throw error
+        throw new ApiError(
+            404,
+            "Employee Not Found"
+        )
     }
-    return employee
+
+    if (employeeData.employeeId) {
+        const existingEmployee = await findEmployeeByEmployeeId(employeeData.employeeId);
+        if (existingEmployee && existingEmployee._id.toString() !== employeeId) {
+            throw new ApiError(
+                404,
+                "Employee Id Already Exists"
+            )
+        }
+    }
+
+    if(employeeData.email){
+        const existingEmployee = await findEmployeeByEmail(employeeData.email);
+        if (existingEmployee && existingEmployee._id.toString() !== employeeId) {
+            throw new ApiError(
+                404,
+                "Email Already Exists"
+            )
+        }
+    }
+    return await updateEmployee(employeeId, employeeData);
 }
 
 export const deleteEmployeeService = async (employeeId) => {
