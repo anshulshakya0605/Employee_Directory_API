@@ -1,4 +1,5 @@
-import { createEmployeeService, deleteEmployeeService, fetchAllEmployeeService, fetchEmployeeByIdService, updateEmployeeService } from "../service/employee.service.js"
+import e from "express";
+import { createEmployeeService, deleteEmployeeService, fetchAllEmployeeService, fetchEmployeeByIdService, updateEmployeeService, uploadEmployeeProfileImageService } from "../service/employee.service.js"
 
 
 export const createEmployee = async (req, res, next) => {
@@ -18,11 +19,11 @@ export const createEmployee = async (req, res, next) => {
 export const fetchAllEmployee = async (req, res, next) => {
     try {
         
-        const employee = await fetchAllEmployeeService();
+        const result = await fetchAllEmployeeService(req.query);
         res.status(200).json({
             success:true,
             message: "Employees Fetched Successfully",
-            data: employee
+            ...result
         })
 
     } catch (error) {
@@ -70,6 +71,20 @@ export const deleteEmployee = async (req, res, next) => {
             data: []
         })
 
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const uploadEmployeeProfileImage = async (req, res, next) => {
+    try {
+        
+        const employee = await uploadEmployeeProfileImageService(req.params.id, req.file)
+        return res.status(200).json({
+            success: true,
+            message: "Profile image uploaded successfully",
+            data: employee
+        })
     } catch (error) {
         next(error)
     }
