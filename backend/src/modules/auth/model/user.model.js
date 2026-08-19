@@ -7,9 +7,9 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    
+
     email: {
-        type: String, 
+        type: String,
         required: true,
         trim: true,
         unique: true,
@@ -26,14 +26,24 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: Object.values(Role),
         default: Role.USER
+    },
+
+    passwordResetToken: {
+        type: String,
+        select: false
+    },
+
+    passwordResetExpires: {
+        type: Date,
+        select: false
     }
 },
 
-{
-    timestamps: true
-}
+    {
+        timestamps: true
+    }
 
-) 
+)
 
 const User = mongoose.model("User", userSchema);
 

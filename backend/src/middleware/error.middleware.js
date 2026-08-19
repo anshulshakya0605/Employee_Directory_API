@@ -3,6 +3,13 @@ import multer from "multer";
 const errorHandler = async (error, req, res, next) => {
     console.error(error);
 
+    if(error.statusCode){
+        return res.status(error.statusCode).json({
+            success: false,
+            message: error.message
+        })
+    }
+
     // Multer error 
     if (error instanceof multer.MulterError) {
         if (error.code === "LIMIT_FILE_SIZE") {
@@ -39,6 +46,51 @@ const errorHandler = async (error, req, res, next) => {
         });
     }
 
+     // Mongoose Validation Error
+    // =========================
+
+    if (error.name === "ValidationError") {
+
+        const errors =
+            Object.values(error.errors)
+                .map(item => item.message);
+
+        return res.status(400).json({
+            success: false,
+            message: "Validation failed",
+            errors
+        });
+    }
+
+    // Invalid MongoDB ObjectId
+    // =========================
+
+    if (error.name === "CastError") {
+
+        return res.status(400).json({
+            success: false,
+            message: "Invalid ID"
+        });
+    }
+
+     // JWT Errors
+    // =========================
+
+    if (error.name === "JsonWebTokenError") {
+
+        return res.status(401).json({
+            success: false,
+            message: "Invalid token"
+        });
+    }
+
+    if (error.name === "TokenExpiredError") {
+
+        return res.status(401).json({
+            success: false,
+            message: "Token expired. Please login again"
+        });
+    }
 
     const statusCode = error.statusCode || 500;
 
